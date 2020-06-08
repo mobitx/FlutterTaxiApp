@@ -11,20 +11,38 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: Login(),
+        body: MyCustomFormState(),
       ),
     );
   }
 }
 
-class Login extends StatefulWidget {
+class MyApp2 extends StatelessWidget {
   @override
-  MyCustomFormState createState() {
-    return MyCustomFormState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: MyCustomFormState2(),
+      ),
+    );
   }
 }
 
-class MyCustomFormState extends State<Login> {
+class MyCustomFormState extends StatefulWidget {
+  @override
+  Login createState() {
+    return Login();
+  }
+}
+
+class MyCustomFormState2 extends StatefulWidget {
+  @override
+  SignUp createState() {
+    return SignUp();
+  }
+}
+
+class Login extends State<MyCustomFormState> {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -106,7 +124,10 @@ class MyCustomFormState extends State<Login> {
                         style: TextStyle(fontSize: 20),
                       ),
                       onPressed: () {
-                        //signup screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MyApp2()),
+                          );
                       },
                     )
                   ],
@@ -114,6 +135,51 @@ class MyCustomFormState extends State<Login> {
                 ))
           ],
         )
+    );
+  }
+}
+
+class SignUp extends State<MyCustomFormState2> {
+  // Create a global key that uniquely identifies the Form widget
+  // and allows validation of the form.
+  //
+  // Note: This is a GlobalKey<FormState>,
+  // not a GlobalKey<MyCustomFormState>.
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    // Build a Form widget using the _formKey created above.
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextFormField(
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'Please enter some text';
+              }
+              return null;
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: RaisedButton(
+              onPressed: () {
+                // Validate returns true if the form is valid, or false
+                // otherwise.
+                if (_formKey.currentState.validate()) {
+                  // If the form is valid, display a Snackbar.
+                  Scaffold.of(context)
+                      .showSnackBar(SnackBar(content: Text('Processing Data')));
+                }
+              },
+              child: Text('Submit'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
