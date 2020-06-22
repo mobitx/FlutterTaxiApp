@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:taxiapp/Screens/Login/login_screen.dart';
+import 'package:taxiapp/Screens/SignUp/sign_up_screen.dart';
 import 'package:taxiapp/components/rounded_button.dart';
 import 'package:taxiapp/constants.dart';
 import 'background.dart';
@@ -41,7 +42,16 @@ class Body extends StatelessWidget{
               text: "SIGN UP",
               color: kPrimaryLightColor,
               textColor: Colors.black,
-              press: () {},
+              press: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return SignUpScreen();
+                    },
+                  ),
+                );
+              },
             ),
           ],
         ),

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:taxiapp/Screens/Login/login_screen.dart';
+import 'package:taxiapp/Screens/SignUp/sign_up_screen.dart';
 import 'package:taxiapp/components/already_have_an_account_check.dart';
 import 'package:taxiapp/components/rounded_button.dart';
 import 'package:taxiapp/components/rounded_input_field.dart';
 import 'package:taxiapp/components/rounded_password_field.dart';
-import 'package:taxiapp/components/text_field_container.dart';
-import 'package:taxiapp/constants.dart';
 import 'background.dart';
 
 class Body extends StatelessWidget{
@@ -42,7 +40,16 @@ class Body extends StatelessWidget{
               ),
               SizedBox(height: size.height * 0.03,),
               AlreadyHaveAnAccountCheck(
-                press: () {},
+                press: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return SignUpScreen();
+                    },
+                  ),
+                  );
+                  },
               ),
             ],
           ),
