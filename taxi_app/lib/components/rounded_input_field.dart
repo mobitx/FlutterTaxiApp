@@ -5,19 +5,22 @@ import 'package:taxiapp/constants.dart';
 class RoundedInputField extends StatelessWidget{
   final String hintText;
   final IconData icon;
-  final ValueChanged<String> onChanged;
+  final TextEditingController controller;
+  final TextInputType keyboardType;
   const RoundedInputField({
     Key key,
     this.hintText,
     this.icon,
-    this.onChanged
+    this.controller,
+    this.keyboardType,
   }): super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: TextField(
-        onChanged: onChanged,
+        controller: controller,
+        keyboardType: keyboardType,
         decoration: InputDecoration(
           icon: Icon(
             icon,

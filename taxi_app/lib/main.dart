@@ -201,21 +201,36 @@ class _HomePageState extends State<DemoPage> {
 import 'package:flutter/material.dart';
 import 'package:taxiapp/Screens/Welcome/welcome_screen.dart';
 import 'constants.dart';
+import 'package:taxiapp/database/database.dart';
 
-void main() => runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final database = await $FloorFlutterDatabase
+      .databaseBuilder('flutter_database.db')
+      .build();
+
+  runApp(MyApp(database));
+}
+
+//void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  final FlutterDatabase database;
+
+  const MyApp(this.database);
+
   //This widget is the root of the app
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Taxi App',
-      theme: ThemeData(
-        primaryColor: kPrimaryColor,
-        scaffoldBackgroundColor: Colors.white
-      ),
-      home: WelcomeScreen(),
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Taxi App',
+        theme: ThemeData(
+            primaryColor: kPrimaryColor,
+            scaffoldBackgroundColor: Colors.white
+        ),
+        home: WelcomeScreen(database)
     );
   }
 }

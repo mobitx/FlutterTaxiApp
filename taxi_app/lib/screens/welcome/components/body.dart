@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:taxiapp/Screens/Login/login_screen.dart';
-import 'package:taxiapp/Screens/SignUp/sign_up_screen.dart';
+import 'package:taxiapp/screens/login/login_screen.dart';
+import 'package:taxiapp/screens/sign_up/sign_up_screen.dart';
 import 'package:taxiapp/components/rounded_button.dart';
 import 'package:taxiapp/constants.dart';
+import 'package:taxiapp/database/database.dart';
 import 'background.dart';
 
 class Body extends StatelessWidget{
+  final FlutterDatabase database;
+
+  const Body(this.database);
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Background(
       child: SingleChildScrollView(
         child: Column(
@@ -32,7 +38,7 @@ class Body extends StatelessWidget{
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return LoginScreen();
+                      return LoginScreen(database);
                       },
                     ),
                   );
@@ -47,7 +53,7 @@ class Body extends StatelessWidget{
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return SignUpScreen();
+                      return SignUpScreen(database);
                     },
                   ),
                 );
