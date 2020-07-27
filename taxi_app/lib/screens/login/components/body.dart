@@ -58,7 +58,7 @@ class Body extends StatelessWidget{
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return HomeScreen(result);
+                              return HomeScreen(result, database);
                             },
                         ),
                       );

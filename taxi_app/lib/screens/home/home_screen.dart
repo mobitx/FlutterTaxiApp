@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:taxiapp/database/database.dart';
 import 'package:taxiapp/database/model/person.dart';
 import 'package:taxiapp/screens/navigation/get_discounts.dart';
 import 'package:taxiapp/screens/navigation/payment_list.dart';
@@ -9,8 +10,9 @@ import 'components/body.dart';
 
 class HomeScreen extends StatelessWidget{
   final Person person;
+  final FlutterDatabase database;
 
-  const HomeScreen(this.person,);
+  const HomeScreen(this.person,this.database);
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,7 @@ class HomeScreen extends StatelessWidget{
               ),
               onTap: () {
 //                Navigator.of(context).pop();
-                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new PaymentList(person: person)));
+                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new PaymentList(person: person, database: database)));
               },
             ),
             new ListTile(

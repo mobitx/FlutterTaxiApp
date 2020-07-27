@@ -87,8 +87,6 @@ class _NewPaymentState extends State<NewPayment>{
                       labelText: 'Number',
                     ),
                     onSaved: (String value) {
-                      print('onSaved = $value');
-                      print('Num controller has = ${numberController.text}');
                       _paymentCard.number = CardUtils.getCleanedNumber(value);
                     },
                     validator: CardUtils.validateCardNum,
@@ -202,14 +200,14 @@ class _NewPaymentState extends State<NewPayment>{
     if(cardAvailable == null){
       var payments = await paymentDao.findAllPayments();
       if(payments.length > 0 ) {
-        id = payments[0].id + 1;
+        id = payments[payments.length-1].id + 1;
       }
 
       var payment = Payment(id, widget.person.id, getCardType(_paymentCard.type), _paymentCard.number,
           _paymentCard.name, _paymentCard.month, _paymentCard.year, _paymentCard.cvv);
       await paymentDao.insertPerson(payment);
 
-      _showInSnackBar('Payment successfully saved!');
+      _showInSnackBar('Payment method successfully saved!');
 
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
@@ -217,8 +215,7 @@ class _NewPaymentState extends State<NewPayment>{
         SystemNavigator.pop();
       }
     }else{
-      Scaffold.of(context).showSnackBar(
-          SnackBar(content: Text("User already available!")));
+      _showInSnackBar('Payment method already available!');
     }
   }
 

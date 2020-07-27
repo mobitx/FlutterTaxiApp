@@ -1,4 +1,3 @@
-import 'package:floor/floor.dart';
 import 'package:flutter/material.dart';
 import 'package:taxiapp/database/database.dart';
 import 'package:taxiapp/database/model/payment.dart';
@@ -8,7 +7,8 @@ import 'package:taxiapp/screens/payment/payment_card.dart';
 
 class PaymentList extends StatefulWidget{
   final Person person;
-  PaymentList({Key key, this.person}) : super(key: key);
+  final FlutterDatabase database;
+  PaymentList({Key key, this.person, this.database}) : super(key: key);
 
   @override
   _PaymentList createState() => new _PaymentList();
@@ -16,15 +16,12 @@ class PaymentList extends StatefulWidget{
 }
 
 class _PaymentList extends State<PaymentList>{
-  List<Payment> paymentList = [];
-  var cashPayment = new Payment(0, 0, "money.png", "Cash", "", 0, 0, 0);
 
-  _updateList() async{
-    final database = await $FloorFlutterDatabase
-        .databaseBuilder('flutter_database.db')
-        .build();
+  Future<List<Payment>>_updateList() async{
+    List<Payment> paymentList = new List();
+    var cashPayment = new Payment(0, 0, "money.png", "Cash", "", 0, 0, 0);
 
-    var paymentDao = database.paymentDao;
+    var paymentDao = widget.database.paymentDao;
     var payments = await paymentDao.findPaymentByUserId(widget.person.id);
 
     if(payments.length > 0){
@@ -37,14 +34,8 @@ class _PaymentList extends State<PaymentList>{
       paymentList.clear();
       paymentList.add(cashPayment);
     }
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    setState(() {
-      _updateList();
-    });
+    return paymentList;
   }
 
   @override
@@ -56,8 +47,6 @@ class _PaymentList extends State<PaymentList>{
 
   @override
   Widget build(BuildContext context) {
-    paymentList.clear();
-    paymentList.add(cashPayment);
     _updateList();
     return Scaffold(
       appBar: AppBar(
@@ -67,20 +56,24 @@ class _PaymentList extends State<PaymentList>{
         child: Column(
           children: <Widget>[
             new SizedBox(
-              height: 200.0,
-              child: new ListView.builder(
-                  itemCount: paymentList.length,
-                  itemBuilder: (context, index){
-                    return ListTile(
-                        leading: CardUtils.getCardIcon(CardUtils.getCardType(paymentList[index].cardType)),
-                        title: Text(paymentList[index].number),
-                    );
-                  }
+              height: 500.0,
+              child: FutureBuilder<List<Payment>>(
+                future: _updateList(),
+                builder: (context, snapshot){
+                  return ListView(
+                    children: snapshot.data.map((payment) => ListTile(
+                      leading: CardUtils.getCardIcon(CardUtils.getCardType(payment.cardType)),
+                      title: Text(payment.number),
+                    )).toList(),
+                  );
+                },
               ),
             ),
             new GestureDetector(
-              onTap: (){
-                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new NewPayment(title: "New Payment", person: widget.person,) ));
+              onTap: () {
+                Navigator.of(context).push(
+                    new MaterialPageRoute(
+                        builder: (context) => new NewPayment(title: "New Payment", person: widget.person,) ));
               },
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
