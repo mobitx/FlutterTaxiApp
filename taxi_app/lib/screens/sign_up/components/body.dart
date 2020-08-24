@@ -3,17 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:taxiapp/components/text_field_container.dart';
 import 'package:taxiapp/database/database.dart';
 import 'package:taxiapp/database/model/person.dart';
+import 'package:taxiapp/screens/login/login_screen.dart';
 
 import '../../../constants.dart';
 import '../../login/components/background.dart';
 
 class Body extends StatefulWidget {
-  final FlutterDatabase database;
-
-  const Body(
-    this.database,
-  );
-
   @override
   BodyAgain createState() => BodyAgain();
 }
@@ -26,6 +21,7 @@ class BodyAgain extends State<Body> {
   String _email;
   String _mobile;
   String _password;
+  FlutterDatabase database;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +39,6 @@ class BodyAgain extends State<Body> {
             SizedBox(height: size.height * 0.03,),
             Form(
               key: _formKey,
-              autovalidate: _autoValidate,
               child: formUI(),
             ),
           ]
@@ -65,9 +60,10 @@ class BodyAgain extends State<Body> {
                 Icons.person,
                 color: kPrimaryColor,
               ),
-              border: const OutlineInputBorder(),
+              border: InputBorder.none,
             ),
             keyboardType: TextInputType.text,
+            textCapitalization: TextCapitalization.words,
             validator: validateName,
             onSaved: (String val) {
               _name = val;
@@ -82,7 +78,7 @@ class BodyAgain extends State<Body> {
                 Icons.phone_android,
                 color: kPrimaryColor,
               ),
-              border: const OutlineInputBorder(),
+              border: InputBorder.none,
             ),
             keyboardType: TextInputType.phone,
             validator: validateMobile,
@@ -99,7 +95,7 @@ class BodyAgain extends State<Body> {
                 Icons.email,
                 color: kPrimaryColor,
               ),
-              border: const OutlineInputBorder(),
+              border: InputBorder.none,
             ),
             keyboardType: TextInputType.emailAddress,
             validator: validateEmail,
@@ -116,7 +112,7 @@ class BodyAgain extends State<Body> {
                 Icons.lock,
                 color: kPrimaryColor,
               ),
-              border: const OutlineInputBorder(),
+              border: InputBorder.none,
             ),
             keyboardType: TextInputType.text,
             obscureText: true,
@@ -205,7 +201,7 @@ class BodyAgain extends State<Body> {
     if(userAvailable == null){
       var persons = await personDao.findAllPersons();
       if(persons.length > 0 ) {
-        id = persons[0].id + 1;
+        id = persons[persons.length-1].id + 1;
       }
       var person = Person(id, _email, _password, _name, _mobile);
       await personDao.insertPerson(person);
@@ -218,6 +214,10 @@ class BodyAgain extends State<Body> {
       } else {
         SystemNavigator.pop();
       }
+
+      Navigator.push(context, MaterialPageRoute( builder: (context) {
+        return LoginScreen();
+      }))    ;
     }else{
       Scaffold.of(context).showSnackBar(
           SnackBar(content: Text("User already available!")));

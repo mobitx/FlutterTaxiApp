@@ -44,7 +44,6 @@ class HomeScreen extends StatelessWidget{
                 style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.normal),
               ),
               onTap: () {
-//                Navigator.of(context).pop();
                 Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new YourTripsScreen()));
               },
             ),
@@ -54,7 +53,6 @@ class HomeScreen extends StatelessWidget{
                 style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.normal),
               ),
               onTap: () {
-//                Navigator.of(context).pop();
                 Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new PaymentList(person: person, database: database)));
               },
             ),
@@ -64,7 +62,6 @@ class HomeScreen extends StatelessWidget{
                 style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.normal),
               ),
               onTap: () {
-//                Navigator.of(context).pop();
                 Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new GetDiscounts()));
               },
             ),
@@ -74,8 +71,7 @@ class HomeScreen extends StatelessWidget{
                 style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.normal),
               ),
               onTap: () {
-//                Navigator.of(context).pop();
-                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Settings()));
+                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Settings(person: person, database: database)));
               },
             ),
           ],

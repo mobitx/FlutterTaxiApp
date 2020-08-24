@@ -203,8 +203,12 @@ class _NewPaymentState extends State<NewPayment>{
         id = payments[payments.length-1].id + 1;
       }
 
+      var length = _paymentCard.number.length;
+
+      var dispayString = "**** ${_paymentCard.number.toString()[length-4]+_paymentCard.number.toString()[length-3]+_paymentCard.number.toString()[length-2]+_paymentCard.number.toString()[length-1]}";
+
       var payment = Payment(id, widget.person.id, getCardType(_paymentCard.type), _paymentCard.number,
-          _paymentCard.name, _paymentCard.month, _paymentCard.year, _paymentCard.cvv);
+          _paymentCard.name, _paymentCard.month, _paymentCard.year, _paymentCard.cvv, dispayString);
       await paymentDao.insertPerson(payment);
 
       _showInSnackBar('Payment method successfully saved!');

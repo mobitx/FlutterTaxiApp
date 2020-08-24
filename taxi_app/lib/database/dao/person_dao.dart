@@ -3,7 +3,7 @@ import 'package:floor/floor.dart';
 
 @dao
 abstract class PersonDao{
-  @Query('SELECT * FROM Person ORDER BY id ASC')
+  @Query('SELECT * FROM Person ORDER BY id')
   Future<List<Person>> findAllPersons();
 
   @Query('SELECT * FROM Person WHERE email = :email AND password = :password')
@@ -14,4 +14,8 @@ abstract class PersonDao{
 
   @insert
   Future<int> insertPerson(Person person);
+
+  @update
+  Future<int> updatePerson(Person person);
+  //flutter packages pub run build_runner build
 }

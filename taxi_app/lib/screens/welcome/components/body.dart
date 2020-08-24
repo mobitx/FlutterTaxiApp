@@ -4,13 +4,9 @@ import 'package:taxiapp/screens/login/login_screen.dart';
 import 'package:taxiapp/screens/sign_up/sign_up_screen.dart';
 import 'package:taxiapp/components/rounded_button.dart';
 import 'package:taxiapp/constants.dart';
-import 'package:taxiapp/database/database.dart';
 import 'background.dart';
 
 class Body extends StatelessWidget{
-  final FlutterDatabase database;
-
-  const Body(this.database);
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +30,12 @@ class Body extends StatelessWidget{
             RoundedButton(
               text: "LOGIN",
               press: () {
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return LoginScreen(database);
+                      return LoginScreen();
                       },
                     ),
                   );
@@ -49,11 +46,12 @@ class Body extends StatelessWidget{
               color: kPrimaryLightColor,
               textColor: Colors.black,
               press: () {
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return SignUpScreen(database);
+                      return SignUpScreen();
                     },
                   ),
                 );

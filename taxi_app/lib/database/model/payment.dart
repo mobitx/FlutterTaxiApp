@@ -11,14 +11,15 @@ class Payment{
   int month;
   int year;
   int cvv;
+  String displayString;
 
   Payment(this.id, this.userId, this.cardType, this.number, this.name,
-      this.month, this.year, this.cvv);
+      this.month, this.year, this.cvv, this.displayString);
 
   @override
   String toString() {
     return 'Payment{id: $id, userId: $userId, cardType: $cardType, name: $name, '
-        'number: $number, name:$name, month:$month, year:$year, cvv:$cvv}';
+        'number: $number, name:$name, month:$month, year:$year, cvv:$cvv, displayString:$displayString}';
   }
 
 

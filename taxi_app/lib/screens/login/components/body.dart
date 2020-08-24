@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taxiapp/screens/sign_up/sign_up_screen.dart';
 import 'package:taxiapp/components/already_have_an_account_check.dart';
 import 'package:taxiapp/components/rounded_button.dart';
@@ -10,9 +11,7 @@ import 'package:taxiapp/screens/home/home_screen.dart';
 import 'background.dart';
 
 class Body extends StatelessWidget{
-  final FlutterDatabase database;
-
-  const Body(this.database);
+  FlutterDatabase database;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +37,7 @@ class Body extends StatelessWidget{
               RoundedInputField(
                 controller: _emailController,
                 hintText: "Your Email", icon: Icons.person,
+                keyboardType: TextInputType.emailAddress,
               ),
               RoundedPasswordField(
                   controller: _passwordController,
@@ -49,11 +49,17 @@ class Body extends StatelessWidget{
                 text: "LOGIN",
                 press: () async {
                   if (_emailController.text.isNotEmpty) {
+                    database = await $FloorFlutterDatabase.databaseBuilder('flutter_database.db').build();
+
                     final personDao = database.personDao;
                     final result = await personDao.findPersonByEmailAndPassword(
                         _emailController.text, _passwordController.text);
                     if (result != null) {
+                      SharedPreferences myPrefs = await SharedPreferences.getInstance();
+                      myPrefs.setBool('Login', true);
+                      myPrefs.setString('Email', result.email);
                       Scaffold.of(context).showSnackBar(SnackBar(content: Text("Login Successful!")));
+                      Navigator.pop(context);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -77,7 +83,7 @@ class Body extends StatelessWidget{
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return SignUpScreen(database);
+                      return SignUpScreen();
                     },
                   ),
                   );

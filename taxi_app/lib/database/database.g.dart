@@ -84,7 +84,7 @@ class _$FlutterDatabase extends FlutterDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `email` TEXT, `password` TEXT, `name` TEXT, `mobile` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Payment` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `userId` INTEGER, `cardType` TEXT, `number` TEXT, `name` TEXT, `month` INTEGER, `year` INTEGER, `cvv` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `Payment` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `userId` INTEGER, `cardType` TEXT, `number` TEXT, `name` TEXT, `month` INTEGER, `year` INTEGER, `cvv` INTEGER, `displayString` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -115,6 +115,17 @@ class _$PersonDao extends PersonDao {
                   'password': item.password,
                   'name': item.name,
                   'mobile': item.mobile
+                }),
+        _personUpdateAdapter = UpdateAdapter(
+            database,
+            'Person',
+            ['id'],
+            (Person item) => <String, dynamic>{
+                  'id': item.id,
+                  'email': item.email,
+                  'password': item.password,
+                  'name': item.name,
+                  'mobile': item.mobile
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -132,9 +143,11 @@ class _$PersonDao extends PersonDao {
 
   final InsertionAdapter<Person> _personInsertionAdapter;
 
+  final UpdateAdapter<Person> _personUpdateAdapter;
+
   @override
   Future<List<Person>> findAllPersons() async {
-    return _queryAdapter.queryList('SELECT * FROM Person ORDER BY id ASC',
+    return _queryAdapter.queryList('SELECT * FROM Person ORDER BY id',
         mapper: _personMapper);
   }
 
@@ -158,6 +171,12 @@ class _$PersonDao extends PersonDao {
     return _personInsertionAdapter.insertAndReturnId(
         person, OnConflictStrategy.abort);
   }
+
+  @override
+  Future<int> updatePerson(Person person) {
+    return _personUpdateAdapter.updateAndReturnChangedRows(
+        person, OnConflictStrategy.abort);
+  }
 }
 
 class _$PaymentDAO extends PaymentDAO {
@@ -174,7 +193,8 @@ class _$PaymentDAO extends PaymentDAO {
                   'name': item.name,
                   'month': item.month,
                   'year': item.year,
-                  'cvv': item.cvv
+                  'cvv': item.cvv,
+                  'displayString': item.displayString
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -191,7 +211,8 @@ class _$PaymentDAO extends PaymentDAO {
       row['name'] as String,
       row['month'] as int,
       row['year'] as int,
-      row['cvv'] as int);
+      row['cvv'] as int,
+      row['displayString'] as String);
 
   final InsertionAdapter<Payment> _paymentInsertionAdapter;
 
