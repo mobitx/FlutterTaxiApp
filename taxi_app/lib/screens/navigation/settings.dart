@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taxiapp/database/database.dart';
+import 'package:taxiapp/database/model/mobile_notification.dart';
 import 'package:taxiapp/database/model/person.dart';
 import 'package:taxiapp/constants.dart';
 import 'package:taxiapp/screens/settings/change_password.dart';
 import 'package:taxiapp/screens/settings/edit_account_details.dart';
 import 'package:taxiapp/screens/settings/privacy.dart';
+import 'package:taxiapp/screens/settings/security.dart';
 import 'package:taxiapp/screens/welcome/welcome_screen.dart';
 
 class Settings extends StatefulWidget {
   final Person person;
   final FlutterDatabase database;
+  final MobileNotification mobileNotification;
 
-  Settings({Key key, this.person, this.database}) : super(key: key);
+  Settings({Key key, this.person, this.database, this.mobileNotification}) : super(key: key);
 
   @override
   _SettingsState createState() => new _SettingsState();
@@ -81,7 +84,7 @@ class _SettingsState extends State<Settings>{
                     subtitle: Text('Manage the data you share with us'),
                     trailing: Icon(Icons.keyboard_arrow_right),
                     onTap: (){
-                      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Privacy()));
+                      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Privacy(widget.database, widget.person, widget.mobileNotification)));
                     },
                   ),
                 ],
@@ -95,7 +98,9 @@ class _SettingsState extends State<Settings>{
                     title: Text('Security'),
                     subtitle: Text('Control your account security with 2-step verification'),
                     trailing: Icon(Icons.keyboard_arrow_right),
-                    onTap: (){},
+                    onTap: (){
+                      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Security(database: widget.database, person: widget.person)));
+                    },
                   ),
                 ],
               ),
@@ -110,7 +115,6 @@ class _SettingsState extends State<Settings>{
                       showDialog(
                         context: context, child:
                           new AlertDialog(
-                            
                             title: Text("Log Out"),
                             content: Text("Are you sure you want to log out?"),
                             actions: <Widget>[
@@ -168,9 +172,11 @@ class _SettingsState extends State<Settings>{
 
     // after the SecondScreen result comes back update the Text widget with it
     setState(() {
-      var array = result.toString().split(" - ");
-      name = array[0];
-      email = array[1];
+      //if(result != null) {
+        var array = result.toString().split(" - ");
+        name = array[0];
+        email = array[1];
+      //}
     });
   }
 }

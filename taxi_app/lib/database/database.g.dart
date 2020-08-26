@@ -64,6 +64,8 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   PaymentDAO _paymentDaoInstance;
 
+  NotificationDao _notificationDaoInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
@@ -82,9 +84,11 @@ class _$FlutterDatabase extends FlutterDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `email` TEXT, `password` TEXT, `name` TEXT, `mobile` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `email` TEXT, `password` TEXT, `name` TEXT, `mobile` TEXT, `isTwoStepVerOn` INTEGER)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Payment` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `userId` INTEGER, `cardType` TEXT, `number` TEXT, `name` TEXT, `month` INTEGER, `year` INTEGER, `cvv` INTEGER, `displayString` TEXT)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `MobileNotification` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `userId` INTEGER, `isAccountAndTripUpdatesOn` INTEGER, `isDiscountAndNewsOn` INTEGER)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -101,6 +105,12 @@ class _$FlutterDatabase extends FlutterDatabase {
   PaymentDAO get paymentDao {
     return _paymentDaoInstance ??= _$PaymentDAO(database, changeListener);
   }
+
+  @override
+  NotificationDao get notificationDao {
+    return _notificationDaoInstance ??=
+        _$NotificationDao(database, changeListener);
+  }
 }
 
 class _$PersonDao extends PersonDao {
@@ -114,7 +124,10 @@ class _$PersonDao extends PersonDao {
                   'email': item.email,
                   'password': item.password,
                   'name': item.name,
-                  'mobile': item.mobile
+                  'mobile': item.mobile,
+                  'isTwoStepVerOn': item.isTwoStepVerOn == null
+                      ? null
+                      : (item.isTwoStepVerOn ? 1 : 0)
                 }),
         _personUpdateAdapter = UpdateAdapter(
             database,
@@ -125,7 +138,10 @@ class _$PersonDao extends PersonDao {
                   'email': item.email,
                   'password': item.password,
                   'name': item.name,
-                  'mobile': item.mobile
+                  'mobile': item.mobile,
+                  'isTwoStepVerOn': item.isTwoStepVerOn == null
+                      ? null
+                      : (item.isTwoStepVerOn ? 1 : 0)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -139,7 +155,10 @@ class _$PersonDao extends PersonDao {
       row['email'] as String,
       row['password'] as String,
       row['name'] as String,
-      row['mobile'] as String);
+      row['mobile'] as String,
+      row['isTwoStepVerOn'] == null
+          ? null
+          : (row['isTwoStepVerOn'] as int) != 0);
 
   final InsertionAdapter<Person> _personInsertionAdapter;
 
@@ -164,6 +183,12 @@ class _$PersonDao extends PersonDao {
   Future<Person> findPersonByEmail(String email) async {
     return _queryAdapter.query('SELECT * FROM Person WHERE email = ?',
         arguments: <dynamic>[email], mapper: _personMapper);
+  }
+
+  @override
+  Future<void> deletePerson(int id) async {
+    await _queryAdapter.queryNoReturn('DELETE FROM Person WHERE id =?',
+        arguments: <dynamic>[id]);
   }
 
   @override
@@ -238,5 +263,81 @@ class _$PaymentDAO extends PaymentDAO {
   Future<int> insertPerson(Payment payment) {
     return _paymentInsertionAdapter.insertAndReturnId(
         payment, OnConflictStrategy.abort);
+  }
+}
+
+class _$NotificationDao extends NotificationDao {
+  _$NotificationDao(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database),
+        _mobileNotificationInsertionAdapter = InsertionAdapter(
+            database,
+            'MobileNotification',
+            (MobileNotification item) => <String, dynamic>{
+                  'id': item.id,
+                  'userId': item.userId,
+                  'isAccountAndTripUpdatesOn':
+                      item.isAccountAndTripUpdatesOn == null
+                          ? null
+                          : (item.isAccountAndTripUpdatesOn ? 1 : 0),
+                  'isDiscountAndNewsOn': item.isDiscountAndNewsOn == null
+                      ? null
+                      : (item.isDiscountAndNewsOn ? 1 : 0)
+                }),
+        _mobileNotificationUpdateAdapter = UpdateAdapter(
+            database,
+            'MobileNotification',
+            ['id'],
+            (MobileNotification item) => <String, dynamic>{
+                  'id': item.id,
+                  'userId': item.userId,
+                  'isAccountAndTripUpdatesOn':
+                      item.isAccountAndTripUpdatesOn == null
+                          ? null
+                          : (item.isAccountAndTripUpdatesOn ? 1 : 0),
+                  'isDiscountAndNewsOn': item.isDiscountAndNewsOn == null
+                      ? null
+                      : (item.isDiscountAndNewsOn ? 1 : 0)
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  static final _mobileNotificationMapper = (Map<String, dynamic> row) =>
+      MobileNotification(
+          row['id'] as int,
+          row['userId'] as int,
+          row['isAccountAndTripUpdatesOn'] == null
+              ? null
+              : (row['isAccountAndTripUpdatesOn'] as int) != 0,
+          row['isDiscountAndNewsOn'] == null
+              ? null
+              : (row['isDiscountAndNewsOn'] as int) != 0);
+
+  final InsertionAdapter<MobileNotification>
+      _mobileNotificationInsertionAdapter;
+
+  final UpdateAdapter<MobileNotification> _mobileNotificationUpdateAdapter;
+
+  @override
+  Future<MobileNotification> findNotificationByUserId(int userId) async {
+    return _queryAdapter.query(
+        'SELECT * FROM MobileNotification WHERE userId = ?',
+        arguments: <dynamic>[userId],
+        mapper: _mobileNotificationMapper);
+  }
+
+  @override
+  Future<int> insertNotification(MobileNotification notification) {
+    return _mobileNotificationInsertionAdapter.insertAndReturnId(
+        notification, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<int> updateNotification(MobileNotification notification) {
+    return _mobileNotificationUpdateAdapter.updateAndReturnChangedRows(
+        notification, OnConflictStrategy.abort);
   }
 }

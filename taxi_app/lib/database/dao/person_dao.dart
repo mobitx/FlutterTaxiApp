@@ -17,5 +17,8 @@ abstract class PersonDao{
 
   @update
   Future<int> updatePerson(Person person);
+
+  @Query('DELETE FROM Person WHERE id =:id')
+  Future<void> deletePerson(int id);
   //flutter packages pub run build_runner build
 }

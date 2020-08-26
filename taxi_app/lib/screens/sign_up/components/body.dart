@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:taxiapp/components/text_field_container.dart';
 import 'package:taxiapp/database/database.dart';
+import 'package:taxiapp/database/model/mobile_notification.dart';
 import 'package:taxiapp/database/model/person.dart';
 import 'package:taxiapp/screens/login/login_screen.dart';
 
@@ -195,6 +196,7 @@ class BodyAgain extends State<Body> {
         .build();
 
     var personDao = database.personDao;
+    var notificationDao = database.notificationDao;
     var userAvailable = await personDao.findPersonByEmail(_email);
     var id = 0;
 
@@ -203,21 +205,34 @@ class BodyAgain extends State<Body> {
       if(persons.length > 0 ) {
         id = persons[persons.length-1].id + 1;
       }
-      var person = Person(id, _email, _password, _name, _mobile);
+      var person = Person(id, _email, _password, _name, _mobile, false);
       await personDao.insertPerson(person);
+      var notification = MobileNotification(id, id, true, true);
+      await notificationDao.insertNotification(notification);
 
       Scaffold.of(context).showSnackBar(
           SnackBar(content: Text("Sign up successful!")));
 
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      } else {
-        SystemNavigator.pop();
-      }
+      Navigator.pushAndRemoveUntil(context,
+          PageRouteBuilder(pageBuilder: (
+              BuildContext context, Animation animation,
+              Animation secondaryAnimation) {
+            return LoginScreen();
+          },
 
-      Navigator.push(context, MaterialPageRoute( builder: (context) {
-        return LoginScreen();
-      }))    ;
+              transitionsBuilder: (BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation,
+                  Widget child) {
+                return new SlideTransition(
+                  position: new Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,).animate(animation),
+                  child: child,
+                );
+              }
+          ),
+              (Route route) => false);
     }else{
       Scaffold.of(context).showSnackBar(
           SnackBar(content: Text("User already available!")));

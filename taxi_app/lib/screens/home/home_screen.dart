@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taxiapp/database/database.dart';
+import 'package:taxiapp/database/model/mobile_notification.dart';
 import 'package:taxiapp/database/model/person.dart';
 import 'package:taxiapp/screens/navigation/get_discounts.dart';
 import 'package:taxiapp/screens/navigation/payment_list.dart';
@@ -11,8 +12,9 @@ import 'components/body.dart';
 class HomeScreen extends StatelessWidget{
   final Person person;
   final FlutterDatabase database;
+  final MobileNotification mobileNotification;
 
-  const HomeScreen(this.person,this.database);
+  const HomeScreen(this.person,this.database,this.mobileNotification);
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +73,7 @@ class HomeScreen extends StatelessWidget{
                 style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.normal),
               ),
               onTap: () {
-                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Settings(person: person, database: database)));
+                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Settings(person: person, database: database, mobileNotification: mobileNotification)));
               },
             ),
           ],

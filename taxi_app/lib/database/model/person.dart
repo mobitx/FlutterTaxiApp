@@ -8,11 +8,12 @@ class Person{
   String password;
   String name;
   String mobile;
+  bool isTwoStepVerOn;
 
-  Person(this.id, this.email, this.password, this.name, this.mobile);
+  Person(this.id, this.email, this.password, this.name, this.mobile, this.isTwoStepVerOn);
 
   @override
   String toString() {
-    return 'Person{id: $id, email: $email, password: $password, name: $name, mobile: $mobile}';
+    return 'Person{id: $id, email: $email, password: $password, name: $name, mobile: $mobile, isTwoStepVerOn: $isTwoStepVerOn}';
   }
 }

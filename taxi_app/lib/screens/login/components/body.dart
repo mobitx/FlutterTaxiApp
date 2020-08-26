@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:taxiapp/screens/login/two_step_verification/otp_screen.dart';
+import 'package:taxiapp/screens/login/two_step_verification/two_step_verification_settings.dart';
 import 'package:taxiapp/screens/sign_up/sign_up_screen.dart';
 import 'package:taxiapp/components/already_have_an_account_check.dart';
 import 'package:taxiapp/components/rounded_button.dart';
@@ -11,8 +13,6 @@ import 'package:taxiapp/screens/home/home_screen.dart';
 import 'background.dart';
 
 class Body extends StatelessWidget{
-  FlutterDatabase database;
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -49,25 +49,42 @@ class Body extends StatelessWidget{
                 text: "LOGIN",
                 press: () async {
                   if (_emailController.text.isNotEmpty) {
-                    database = await $FloorFlutterDatabase.databaseBuilder('flutter_database.db').build();
+                    FlutterDatabase database = await $FloorFlutterDatabase.databaseBuilder('flutter_database.db').build();
 
                     final personDao = database.personDao;
+                    final notificationDao = database.notificationDao;
                     final result = await personDao.findPersonByEmailAndPassword(
                         _emailController.text, _passwordController.text);
                     if (result != null) {
-                      SharedPreferences myPrefs = await SharedPreferences.getInstance();
-                      myPrefs.setBool('Login', true);
-                      myPrefs.setString('Email', result.email);
-                      Scaffold.of(context).showSnackBar(SnackBar(content: Text("Login Successful!")));
-                      Navigator.pop(context);
-                      Navigator.push(
+                      final mobileNotification = await notificationDao.findNotificationByUserId(result.id);
+                      if(!result.isTwoStepVerOn) {
+                        SharedPreferences myPrefs = await SharedPreferences
+                            .getInstance();
+                        myPrefs.setBool('Login', true);
+                        myPrefs.setString('Email', result.email);
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(content: Text("Login Successful!")));
+                        Navigator.pop(context);
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return HomeScreen(result, database);
+                              return HomeScreen(
+                                  result, database, mobileNotification);
                             },
-                        ),
-                      );
+                          ),
+                        );
+                      }else{
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return OTPScreen(result, database, mobileNotification);
+                            },
+                          ),
+                        );
+                      }
                     } else {
                       Scaffold.of(context).showSnackBar(SnackBar(content: Text("Wrong email or password!")));
                     }

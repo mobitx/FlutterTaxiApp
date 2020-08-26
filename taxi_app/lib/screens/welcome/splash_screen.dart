@@ -42,12 +42,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       if(loggedIn){
         database = await $FloorFlutterDatabase.databaseBuilder('flutter_database.db').build();
         final personDao = database.personDao;
+        final notificationDao = database.notificationDao;
         final result = await personDao.findPersonByEmail(email);
+        final mobileNotification = await notificationDao.findNotificationByUserId(result.id) ;
         if (result != null) {
           myPrefs.setBool('Login', true);
           myPrefs.setString('Email', result.email);
           Navigator.of(context).pushReplacement(new MaterialPageRoute(
-              builder: (BuildContext context) => new HomeScreen(result, database)));
+              builder: (BuildContext context) => new HomeScreen(result, database, mobileNotification)));
         }else{
           Navigator.of(context).pushReplacement(new MaterialPageRoute(
               builder: (BuildContext context) => new WelcomeScreen()));
